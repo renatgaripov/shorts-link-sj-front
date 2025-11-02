@@ -1,0 +1,7 @@
+image:
+  repository: "ghcr.io/renatgaripov/renatgaripov/shorts-link-sj-front/node-app-main"
+
+deploy:
+  projectDomain: "4clk.me"
+
+configMapData:

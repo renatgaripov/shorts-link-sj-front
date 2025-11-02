@@ -1,0 +1,7 @@
+image:
+  pullPolicy: Always
+  tag: "latest"
+
+deploy:
+  projectName: "shorts-link-front"
+  containerPort: "3000"
