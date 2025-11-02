@@ -25,6 +25,7 @@ COPY package.json yarn.lock ./
 
 # Install only production dependencies
 RUN yarn install --frozen-lockfile --production
+RUN yarn cache clean
 
 # Copy built application from builder
 COPY --from=builder /app/.output ./.output
