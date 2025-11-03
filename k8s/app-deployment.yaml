@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clicker-app
+  namespace: clicker
+spec:
+  replicas: 2 # Настройте количество реплик по необходимости
+  selector:
+    matchLabels:
+      app: clicker-app
+  template:
+    metadata:
+      labels:
+        app: clicker-app
+    spec:
+      containers:
+      - name: app
+        image: clicker-app:latest # Замените на ваш registry/image:tag
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: clicker-config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      # Раскомментируйте, если используете private registry
+      # imagePullSecrets:
+      # - name: registry-secret
+

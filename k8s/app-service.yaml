@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: clicker-app-service
+  namespace: clicker
+spec:
+  selector:
+    app: clicker-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: ClusterIP # Измените на LoadBalancer или NodePort если нужно
+

@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: clicker-ingress
+  namespace: clicker
+  annotations:
+    # SSL redirect
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Cert-manager для автоматического получения сертификатов
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # CORS настройки
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Accept, Origin, X-Requested-With"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-max-age: "3600"
+    # Rate limiting (опционально)
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    # Дополнительные настройки
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  ingressClassName: nginx # Измените на ваш ingress class
+  tls:
+  - hosts:
+    - 4clk.me # Замените на ваш домен
+    secretName: clicker-tls # Cert-manager автоматически создаст этот secret
+  rules:
+  - host: 4clk.me # Замените на ваш домен
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: clicker-app-service
+            port:
+              number: 80
+

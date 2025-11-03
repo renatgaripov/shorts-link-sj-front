@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clicker-config
+  namespace: clicker
+data:
+  MONGODB_URI: "mongodb://mongo-service:27017/clicker"
+  NODE_ENV: "production"
+  PORT: "3000"
+  NUXT_HOST: "0.0.0.0"
+
