@@ -21,7 +21,7 @@ FROM node:20-alpine AS production
 WORKDIR /app
 
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock scripts ./
 
 # Install only production dependencies
 RUN yarn install --frozen-lockfile --production
