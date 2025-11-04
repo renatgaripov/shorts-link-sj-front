@@ -24,8 +24,6 @@ spec:
       labels:
         app: clicker-app
     spec:
-    imagePullSecrets:
-    - name: regcred
       containers:
       - name: app
         image: ghcr.io/renatgaripov/shorts-link-sj-front/vue-app-fullstack
@@ -56,6 +54,6 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 5
       # Раскомментируйте, если используете private registry
-      # imagePullSecrets:
-      # - name: registry-secret
+      imagePullSecrets:
+      - name: regcred
 
