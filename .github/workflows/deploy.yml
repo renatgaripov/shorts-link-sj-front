@@ -57,7 +57,7 @@ jobs:
           tar -zxvf helm-v3.8.0-linux-amd64.tar.gz
           mv linux-amd64/helm /usr/local/bin/helm
       - name: Lint helm chart
-        run: helm lint ./deployment/helm -f ./deployment/helm/${{ github.ref_name }}.yaml
+        run: helm lint ./deployment/helm
       - name: Deploy
         run: |
           helm upgrade --install --atomic --timeout 3m clicker-app ./deployment/helm --debug --set image.tag=sha-${GITHUB_SHA} --namespace clicker-app --create-namespace
