@@ -2,12 +2,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: clicker-ingress
-  namespace: clicker
   annotations:
     # SSL redirect
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # Cert-manager для автоматического получения сертификатов
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: "letsencrypt"
     # CORS настройки
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
@@ -23,11 +22,11 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
 spec:
-  ingressClassName: nginx # Измените на ваш ingress class
+  ingressClassName: traefik # Измените на ваш ingress class
   tls:
   - hosts:
     - 4clk.me # Замените на ваш домен
-    secretName: clicker-tls # Cert-manager автоматически создаст этот secret
+    secretName: tls-secret # Cert-manager автоматически создаст этот secret
   rules:
   - host: 4clk.me # Замените на ваш домен
     http:

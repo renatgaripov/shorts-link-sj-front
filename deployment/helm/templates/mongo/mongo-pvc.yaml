@@ -2,12 +2,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-data-pvc
-  namespace: clicker
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
-  # storageClassName: "standard" # Раскомментируйте и укажите нужный StorageClass
-
+    storageClassName: "local-path" # Раскомментируйте и укажите нужный StorageClass

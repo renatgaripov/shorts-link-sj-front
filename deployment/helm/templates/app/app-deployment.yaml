@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: clicker-app
-  namespace: clicker
 spec:
   replicas: 2 # Настройте количество реплик по необходимости
   selector:
@@ -15,7 +14,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: clicker-app:latest # Замените на ваш registry/image:tag
+        iamge: ghcr.io/renatgaripov/shorts-link-sj-front/vue-app-fullstack
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
