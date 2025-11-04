@@ -25,8 +25,8 @@ spec:
         volumeMounts:
         - name: mongo-data
           mountPath: /data/db
-        - name: mongo-config
-          mountPath: /data/configdb
+        #- name: mongo-config
+        #  mountPath: /data/configdb
         resources:
           requests:
             memory: "256Mi"
