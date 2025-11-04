@@ -1,3 +1,15 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: regcred
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: >-
+    eyJhdXRocyI6eyJnaGNyLmlvIjp7InVzZXJuYW1lIjoicmVuYXRAc29jaWFsamV0LnBybyIsInBhc3N3b3JkIjoiZ2hwX2E0VVJyYkh2T1NMODl1aXZtaGQyVkpTNDQ1ZUQwTTBpZmoySCIsImF1dGgiOiJjbVZ1WVhSQWMyOWphV0ZzYW1WMExuQnlienBuYUhCZllUUlZVbkppU0haUFUwdzRPWFZwZG0xb1pESldTbE0wTkRWbFJEQk5NR2xtYWpKSUNnPT0ifX19Cg==
+
+---
+
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -12,6 +24,8 @@ spec:
       labels:
         app: clicker-app
     spec:
+    imagePullSecrets:
+    - name: regcred
       containers:
       - name: app
         image: ghcr.io/renatgaripov/shorts-link-sj-front/vue-app-fullstack
