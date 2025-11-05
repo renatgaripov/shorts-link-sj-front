@@ -5,7 +5,7 @@
   </div>
   <div class="flex flex-col justify-between gap-1 pr-5 flex-1 bg-white py-4">
     <div class="text-base text-[#3A3D44]">{{ link.name }}</div>
-    <div class="text-xs text-[#3176FF] line-clamp-1 break-all">{{ link.full }}</div>
+    <a :href="link.full" target="_blank" class="text-xs text-[#3176FF] line-clamp-1 break-all cursor-pointer">{{ link.full }}</a>
     <div class="text-xs text-[#3A3D44] bg-[#F1F4F9] px-2 py-1 rounded-md w-fit">
       {{ dayjs.utc(link.created_at).local().format('DD.MM.YY HH:mm:ss') || '' }}
     </div>
@@ -13,7 +13,7 @@
   <div
     class="px-6 bg-white relative flex items-center justify-between h-full py-5 text-base text-[#3176FF] border-x-offset"
   >
-    <span class="line-clamp-1 break-all">{{ shortLink.replace('https://', '') }}</span>
+    <a :href="shortLink" target="_blank" class="line-clamp-1 break-all cursor-pointer">{{ shortLink.replace('https://', '') }}</a>
     <Icon name="fluent:document-copy-16-filled" class="text-2xl ml-8 flex-shrink-0 cursor-pointer" @click="copyLink" />
   </div>
   <div
