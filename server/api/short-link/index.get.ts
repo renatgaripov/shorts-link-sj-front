@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         await connectDB();
 
         const query = getQuery(event);
-        const search = query.q as string | undefined;
+        let search = query.q as string | undefined;
 
         // Параметры пагинации
         const page = parseInt(query.page as string) || 1;
@@ -26,6 +26,27 @@ export default defineEventHandler(async (event) => {
         let filter: any = {};
 
         if (search && search.trim()) {
+            // Если поисковый запрос содержит полную ссылку типа https://4clk.me/xxx
+            // извлекаем короткий код после последнего слеша
+            if (search.includes('4clk.me/')) {
+                // Извлекаем все что после 4clk.me/
+                const match = search.match(/4clk\.me\/([^\/\s?#]+)/i);
+                if (match && match[1]) {
+                    search = match[1];
+                } else {
+                    // Если не нашли, берем часть после последнего слеша
+                    const parts = search.split('/');
+                    search = parts[parts.length - 1] || search;
+                }
+            } else if (search.includes('/')) {
+                // Если есть слеш, но не 4clk.me - берем часть после последнего слеша
+                const parts = search.split('/');
+                search = parts[parts.length - 1] || search;
+            }
+
+            // Очищаем от пробелов, параметров и якорей
+            search = search.trim().split('?')[0].split('#')[0];
+
             filter = {
                 $or: [
                     { name: { $regex: search, $options: 'i' } },
