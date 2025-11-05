@@ -5,31 +5,21 @@
         <div class="text-2xl font-bold text-[#3A3D44]">Ссылки</div>
         <div class="">
           <fieldset class="fieldset relative">
-            <input
-              type="text"
-              v-model="search"
+            <input type="text" v-model="search"
               class="rounded-2xl bg-white pl-6 py-2.5 md:w-[270px] text-md placeholder:text-md focus:outline-none pr-10"
-              placeholder="Ссылка или название"
-            />
-            <Icon
-              v-if="search === ''"
-              name="mdi:magnify"
-              class="text-2xl text-[#231F20]/50 absolute right-3 top-1/2 -translate-y-1/2"
-            />
-            <Icon
-              v-else
-              name="mdi:close"
+              placeholder="Ссылка или название" />
+            <Icon v-if="search === ''" name="mdi:magnify"
+              class="text-2xl text-[#231F20]/50 absolute right-3 top-1/2 -translate-y-1/2" />
+            <Icon v-else name="mdi:close"
               class="text-2xl text-[#231F20]/50 absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-              @click="search = ''"
-            />
+              @click="search = ''" />
           </fieldset>
         </div>
       </div>
       <div>
         <button
           class="rounded-2xl bg-[#3176FF] text-white px-4 py-3 text-base w-[215px] hover:opacity-80 cursor-pointer max-md:mt-4"
-          @click="openModal2"
-        >
+          @click="openModal2">
           Сократить ссылку
         </button>
       </div>
@@ -65,51 +55,39 @@
         <div class="flex gap-6 my-4 max-md:flex-col">
           <fieldset class="fieldset flex-1">
             <legend class="fieldset-legend font-normal">Вставьте ссылку</legend>
-            <input
-              type="text"
-              v-model="newLinkData.full"
+            <input type="text" v-model="newLinkData.full"
               class="rounded-lg bg-white pl-6 py-2.5 text-md border border-[#D9E5FF] placeholder:text-md focus:outline-none"
-              placeholder="https://"
-            />
+              placeholder="https://" />
             <p v-if="error.full" class="label text-red-500">{{ error.full }}</p>
           </fieldset>
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend font-normal">Задать свой адрес</legend>
-            <input
-              type="text"
-              v-model="newLinkData.short"
+            <input type="text" v-model="newLinkData.short"
               class="rounded-lg bg-white pl-6 py-2.5 text-md border border-[#D9E5FF] placeholder:text-md focus:outline-none"
-              placeholder="/"
-            />
+              placeholder="/" />
             <p v-if="error.short" class="label text-red-500">{{ error.short }}</p>
           </fieldset>
         </div>
         <div>
           <fieldset class="fieldset">
             <legend class="fieldset-legend font-normal">Название для ссылки</legend>
-            <input
-              type="text"
-              v-model="newLinkData.name"
+            <input type="text" v-model="newLinkData.name"
               class="rounded-lg bg-white pl-6 py-2.5 text-md border border-[#D9E5FF] placeholder:text-md focus:outline-none"
-              placeholder="..."
-            />
+              placeholder="..." />
             <p v-if="error.name" class="label text-red-500">{{ error.name }}</p>
           </fieldset>
         </div>
         <div class="modal-action w-full flex items-center justify-between">
           <button
             class="rounded-2xl bg-[#3176FF] text-white w-full py-3 text-base cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
-            @click="saveLink"
-            :disabled="buttonDisabled"
-          >
+            @click="saveLink" :disabled="buttonDisabled">
             Сохранить
           </button>
 
           <button
             class="rounded-2xl border border-[#3176FF] text-[#3176FF] w-[210px] py-3 text-base cursor-pointer hover:opacity-80"
-            @click="closeModal2"
-          >
+            @click="closeModal2">
             Отмена
           </button>
         </div>
@@ -123,14 +101,12 @@
       <div class="modal-action w-full flex items-center gap-5">
         <button
           class="rounded-2xl bg-white text-[#3176FF] border border-[#3176FF] px-4 py-3 text-base w-[215px] hover:opacity-80 cursor-pointer"
-          @click="closeModal3"
-        >
+          @click="closeModal3">
           Отмена
         </button>
         <button
           class="rounded-2xl bg-[#FF6266] text-white px-4 py-3 text-base w-[215px] hover:opacity-80 cursor-pointer"
-          @click="deleteLinkService(deleteId!)"
-        >
+          @click="deleteLinkService(deleteId!)">
           Удалить
         </button>
       </div>
@@ -261,8 +237,13 @@
   };
 
   const isValidUrl = (url: string): boolean => {
-    const pattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-    return pattern.test(url);
+    // 
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const saveLink = async () => {
