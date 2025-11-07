@@ -1,5 +1,7 @@
 import connectDB from '../utils/mongodb';
 import Link from '../models/Link';
+import LinkStat from '../models/LinkStat';
+import { getMoscowDayStart } from '../utils/date';
 import { sendRedirect, parseCookies, setCookie } from 'h3';
 
 export default defineEventHandler(async (event) => {
@@ -32,9 +34,17 @@ export default defineEventHandler(async (event) => {
         // Если куки нет - это первый клик, увеличиваем счетчик
         if (!hasClicked) {
           // Увеличиваем счетчик кликов атомарно
-          await Link.findByIdAndUpdate(link._id, { 
-            $inc: { clicks: 1 } 
+          await Link.findByIdAndUpdate(link._id, {
+            $inc: { clicks: 1 }
           });
+
+          // Обновляем статистику по дням (московское время)
+          const moscowDayStart = getMoscowDayStart();
+          await LinkStat.updateOne(
+            { linkId: link._id, date: moscowDayStart },
+            { $inc: { clicks: 1 } },
+            { upsert: true }
+          );
 
           // Устанавливаем куку на 1 час (3600 секунд)
           setCookie(event, cookieName, '1', {
