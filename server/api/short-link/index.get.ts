@@ -1,5 +1,7 @@
 import connectDB from '../../utils/mongodb';
 import Link from '../../models/Link';
+import LinkStat from '../../models/LinkStat';
+import User from '../../models/User';
 import { getAuthToken, verifyToken } from '../../utils/auth';
 
 export default defineEventHandler(async (event) => {
@@ -16,7 +18,8 @@ export default defineEventHandler(async (event) => {
         await connectDB();
 
         const query = getQuery(event);
-        let search = query.q as string | undefined;
+        const rawSearch = (query.q as string | undefined)?.trim();
+        let search = rawSearch;
 
         // Параметры пагинации
         const page = parseInt(query.page as string) || 1;
@@ -24,8 +27,21 @@ export default defineEventHandler(async (event) => {
         const skip = (page - 1) * limit;
 
         let filter: any = {};
+        const orFilters: any[] = [];
 
-        if (search && search.trim()) {
+        let userIdsByLogin: string[] = [];
+
+        if (rawSearch) {
+            const matchedUsers = (await User.find({
+                login: { $regex: rawSearch, $options: 'i' },
+            })
+                .select('_id')
+                .lean()) as Array<{ _id: string }>;
+
+            userIdsByLogin = matchedUsers.map((user) => user._id.toString());
+        }
+
+        if (search) {
             // Если поисковый запрос содержит полную ссылку типа https://4clk.me/xxx
             // извлекаем короткий код после последнего слеша
             if (search.includes('4clk.me/')) {
@@ -47,12 +63,22 @@ export default defineEventHandler(async (event) => {
             // Очищаем от пробелов, параметров и якорей
             search = search.trim().split('?')[0].split('#')[0];
 
+            orFilters.push(
+                { name: { $regex: search, $options: 'i' } },
+                { full: { $regex: search, $options: 'i' } },
+                { short: { $regex: search, $options: 'i' } },
+            );
+        }
+
+        if (userIdsByLogin.length > 0) {
+            orFilters.push({
+                userId: { $in: userIdsByLogin },
+            });
+        }
+
+        if (orFilters.length > 0) {
             filter = {
-                $or: [
-                    { name: { $regex: search, $options: 'i' } },
-                    { full: { $regex: search, $options: 'i' } },
-                    { short: { $regex: search, $options: 'i' } },
-                ],
+                $or: orFilters,
             };
         }
 
@@ -66,6 +92,50 @@ export default defineEventHandler(async (event) => {
             .limit(limit)
             .lean();
 
+        // console.log('links', links);
+
+        const linkIds = links.map((link) => link._id);
+        const stats = await LinkStat.find({ linkId: { $in: linkIds } })
+            .sort({ date: -1 })
+            .lean();
+
+        const userIds = Array.from(
+            new Set(
+                links
+                    .map((link) => link.userId)
+                    .filter((id): id is string => Boolean(id))
+            )
+        );
+
+        const userMap = new Map<string, string>();
+        if (userIds.length) {
+            const rawUsers = await User.find({ _id: { $in: userIds } })
+                .select('_id login')
+                .lean();
+
+            for (const user of rawUsers as Array<{ _id: any; login?: string }>) {
+                if (!user.login) continue;
+                const id =
+                    typeof user._id === 'string'
+                        ? user._id
+                        : user._id?.toString?.();
+                if (!id) continue;
+                userMap.set(id, user.login);
+            }
+        }
+
+        const statsMap = new Map<string, Array<{ date: string; clicks: number }>>();
+        for (const stat of stats) {
+            const key = stat.linkId.toString();
+            if (!statsMap.has(key)) {
+                statsMap.set(key, []);
+            }
+            statsMap.get(key)!.push({
+                date: stat.date.toISOString(),
+                clicks: stat.clicks || 0,
+            });
+        }
+
         // Вычисляем количество страниц
         const totalPages = Math.ceil(total / limit);
 
@@ -78,6 +148,9 @@ export default defineEventHandler(async (event) => {
                 project: link.project,
                 created_at: link.created_at,
                 clicks: link.clicks || 0,
+                stats: statsMap.get(link._id.toString()) || [],
+                userId: link.userId,
+                userLogin: link.userId ? userMap.get(link.userId.toString()) || null : null,
             })),
             meta: {
                 total,

@@ -5,21 +5,31 @@
         <div class="text-2xl font-bold text-[#3A3D44]">Ссылки</div>
         <div class="">
           <fieldset class="fieldset relative">
-            <input type="text" v-model="search"
+            <input
+              type="text"
+              v-model="search"
               class="rounded-2xl bg-white pl-6 py-2.5 md:w-[270px] text-md placeholder:text-md focus:outline-none pr-10"
-              placeholder="Ссылка или название" />
-            <Icon v-if="search === ''" name="mdi:magnify"
-              class="text-2xl text-[#231F20]/50 absolute right-3 top-1/2 -translate-y-1/2" />
-            <Icon v-else name="mdi:close"
+              placeholder="Ссылка или название"
+            />
+            <Icon
+              v-if="search === ''"
+              name="mdi:magnify"
+              class="text-2xl text-[#231F20]/50 absolute right-3 top-1/2 -translate-y-1/2"
+            />
+            <Icon
+              v-else
+              name="mdi:close"
               class="text-2xl text-[#231F20]/50 absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-              @click="search = ''" />
+              @click="search = ''"
+            />
           </fieldset>
         </div>
       </div>
       <div>
         <button
           class="rounded-2xl bg-[#3176FF] text-white px-4 py-3 text-base w-[215px] hover:opacity-80 cursor-pointer max-md:mt-4"
-          @click="openModal2">
+          @click="openModal2"
+        >
           Сократить ссылку
         </button>
       </div>
@@ -32,12 +42,22 @@
       <template v-else>
         <div v-if="isMdOrLarger" class="grid md:grid-cols-[auto_1fr_1fr_auto_auto] gap-y-4">
           <template v-for="link in links" :key="link.id">
-            <ClickBlock :link="link" @deleteLink="deleteLink($event)" />
+            <ClickBlock
+              :link="link"
+              @deleteLink="deleteLink($event)"
+              @showStats="showStats($event)"
+              @set-search="search = link.userLogin || ''"
+            />
           </template>
         </div>
         <div v-else>
           <template v-for="link in links" :key="link.id">
-            <ClickBlockMobile :link="link" @deleteLink="deleteLink($event)" />
+            <ClickBlockMobile
+              :link="link"
+              @deleteLink="deleteLink($event)"
+              @showStats="showStats($event)"
+              @set-search="search = link.userLogin || ''"
+            />
           </template>
         </div>
         <div v-if="links.length === 0" class="text-center py-4">
@@ -47,47 +67,81 @@
     </div>
   </div>
   <!-- MODALS -->
+  <!-- SHOW STATS -->
+  <dialog ref="modalRef4" id="my_modal_4" class="modal">
+    <div class="modal-box w-[99%] md:w-[400px] md:max-w-[400px] bg-[#F1F4F9] rounded-2xl p-4 md:p-8">
+      <div class="text-lg">Статистика кликов по ссылке "{{ link?.name }}"?</div>
+      <div class="mt-4">
+        <template v-for="stat in link?.stats" :key="stat.date">
+          <div class="flex items-center justify-start gap-2">
+            <div class="text-sm text-[#3A3D44]">{{ dayjs(stat.date).format('DD.MM.YY') }}</div>
+            <div class="text-base font-medium text-[#3A3D44]">{{ stat.clicks }}</div>
+          </div>
+        </template>
+      </div>
+      <div class="modal-action w-full flex items-center justify-between">
+        <button
+          class="rounded-2xl bg-[#3176FF] text-white w-full py-3 text-base cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="closeModal4"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </dialog>
   <!-- new link -->
   <dialog ref="modalRef2" id="my_modal_2" class="modal">
-    <div class="modal-box w-full md:w-[700px] max-w-[700px] bg-[#F1F4F9] rounded-2xl p-8">
-      <div class="bg-white w-full h-full rounded-2xl px-8 py-5">
+    <div class="modal-box w-full md:w-[700px] md:max-w-[700px] bg-[#F1F4F9] rounded-2xl p-4 md:p-8">
+      <div class="bg-white w-full h-full rounded-2xl p-4 md:px-8 md:py-5">
         <h3 class="text-xl font-bold">Сокращение ссылки</h3>
         <div class="flex gap-6 my-4 max-md:flex-col">
           <fieldset class="fieldset flex-1">
             <legend class="fieldset-legend font-normal">Вставьте ссылку</legend>
-            <input type="text" v-model="newLinkData.full"
+            <input
+              type="text"
+              v-model="newLinkData.full"
               class="rounded-lg bg-white pl-6 py-2.5 text-md border border-[#D9E5FF] placeholder:text-md focus:outline-none"
-              placeholder="https://" />
+              placeholder="https://"
+            />
             <p v-if="error.full" class="label text-red-500">{{ error.full }}</p>
           </fieldset>
 
           <fieldset class="fieldset">
             <legend class="fieldset-legend font-normal">Задать свой адрес</legend>
-            <input type="text" v-model="newLinkData.short"
+            <input
+              type="text"
+              v-model="newLinkData.short"
               class="rounded-lg bg-white pl-6 py-2.5 text-md border border-[#D9E5FF] placeholder:text-md focus:outline-none"
-              placeholder="/" />
+              placeholder="/"
+            />
             <p v-if="error.short" class="label text-red-500">{{ error.short }}</p>
           </fieldset>
         </div>
         <div>
           <fieldset class="fieldset">
             <legend class="fieldset-legend font-normal">Название для ссылки</legend>
-            <input type="text" v-model="newLinkData.name"
+            <input
+              type="text"
+              v-model="newLinkData.name"
               class="rounded-lg bg-white pl-6 py-2.5 text-md border border-[#D9E5FF] placeholder:text-md focus:outline-none"
-              placeholder="..." />
+              placeholder="..."
+            />
             <p v-if="error.name" class="label text-red-500">{{ error.name }}</p>
           </fieldset>
         </div>
         <div class="modal-action w-full flex items-center justify-between">
           <button
             class="rounded-2xl bg-[#3176FF] text-white w-full py-3 text-base cursor-pointer hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
-            @click="saveLink" :disabled="buttonDisabled">
+            @click="saveLink"
+            :disabled="buttonDisabled"
+          >
             Сохранить
           </button>
 
           <button
             class="rounded-2xl border border-[#3176FF] text-[#3176FF] w-[210px] py-3 text-base cursor-pointer hover:opacity-80"
-            @click="closeModal2">
+            @click="closeModal2"
+          >
             Отмена
           </button>
         </div>
@@ -96,17 +150,19 @@
   </dialog>
   <!-- remove link -->
   <dialog ref="modalRef3" id="my_modal_3" class="modal">
-    <div class="modal-box w-[700px] max-w-[700px] bg-[#F1F4F9] rounded-2xl p-8">
+    <div class="modal-box w-[99%] md:w-[700px] md:max-w-[700px] bg-[#F1F4F9] rounded-2xl p-4 md:p-8">
       <div class="text-lg">Удалить ссылку "{{ deleteName || 'Cсылка' }}"?</div>
       <div class="modal-action w-full flex items-center gap-5">
         <button
           class="rounded-2xl bg-white text-[#3176FF] border border-[#3176FF] px-4 py-3 text-base w-[215px] hover:opacity-80 cursor-pointer"
-          @click="closeModal3">
+          @click="closeModal3"
+        >
           Отмена
         </button>
         <button
           class="rounded-2xl bg-[#FF6266] text-white px-4 py-3 text-base w-[215px] hover:opacity-80 cursor-pointer"
-          @click="deleteLinkService(deleteId!)">
+          @click="deleteLinkService(deleteId!)"
+        >
           Удалить
         </button>
       </div>
@@ -118,6 +174,7 @@
   import MainService from '@/services/mainService';
   import type { Link } from '@/types/links';
   const { show: toast } = useToast();
+  const dayjs = useDayjs();
 
   const breakpoints = useBreakpoints({
     md: 768,
@@ -129,7 +186,17 @@
 
   const modalRef2 = ref(null);
   const modalRef3 = ref(null);
-
+  const modalRef4 = ref(null);
+  const link = ref<Link | null>(null);
+  const closeModal4 = () => {
+    // @ts-ignore
+    modalRef4?.value?.close();
+  };
+  const showStats = (id: number) => {
+    link.value = links.value.find((item) => item.id === id) || null;
+    // @ts-ignore
+    modalRef4?.value?.showModal();
+  };
   const newLinkData = ref({
     full: '',
     short: '',
@@ -140,7 +207,7 @@
   const loading = ref(false);
 
   const buttonDisabled = computed(() => {
-    return !newLinkData.value.full || !newLinkData.value.name;
+    return !newLinkData.value.full;
   });
 
   const links = ref<Link[]>([]);
@@ -193,7 +260,7 @@
     if (!deleteId.value) return;
     try {
       const res = await mainService.deleteLink(id);
-      console.log(res);
+      // console.log(res);
       closeModal3();
       toast('Ссылка удалена', 'success', 3000);
       links.value = links.value.filter((item) => item.id !== id);
@@ -215,12 +282,12 @@
     }
 
     // Валидация name
-    if (!newLinkData.value.name) {
-      error.value.name = 'Название обязательно';
-    } else if (newLinkData.value.name.length < 2) {
-      error.value.name = 'Название должно быть не менее 2 символов';
-    } else if (newLinkData.value.name.length > 50) {
-      error.value.name = 'Название должно быть не более 50 символов';
+    if (newLinkData.value.name) {
+      if (newLinkData.value.name.length < 2) {
+        error.value.name = 'Название должно быть не менее 2 символов';
+      } else if (newLinkData.value.name.length > 50) {
+        error.value.name = 'Название должно быть не более 50 символов';
+      }
     }
 
     // Валидация short (если заполнено)
@@ -237,7 +304,7 @@
   };
 
   const isValidUrl = (url: string): boolean => {
-    // 
+    //
     try {
       new URL(url);
       return true;
@@ -249,6 +316,10 @@
   const saveLink = async () => {
     if (!validateForm()) return;
     try {
+      if (!newLinkData.value.name) {
+        // @ts-ignore
+        newLinkData.value.name = newLinkData.value.full.split('/').pop();
+      }
       const res = await mainService.createLink(newLinkData.value);
       closeModal2();
       toast('Ссылка сохранена', 'success', 3000);
@@ -287,4 +358,9 @@
   onMounted(() => {
     getAllLinks();
   });
+
+  const ADMIN_DEFAULT = {
+    login: 'admin',
+    password: 'admin123',
+  };
 </script>

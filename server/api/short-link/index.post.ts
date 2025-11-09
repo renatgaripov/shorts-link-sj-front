@@ -58,12 +58,15 @@ export default defineEventHandler(async (event) => {
             }
         }
 
+        const userId = getCookie(event, 'userId4clk');
+
         const newLink = new Link({
             name: name.trim(),
             full: full.trim(),
             short: shortLink,
             clicks: 0,
             created_at: new Date(),
+            userId: userId,
         });
 
         await newLink.save();

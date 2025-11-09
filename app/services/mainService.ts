@@ -52,17 +52,17 @@ export default class MainService {
             }
 
             // Проверяем, есть ли тело ответа
-        const contentType = response.headers.get('content-type');
-        const contentLength = response.headers.get('content-length');
-        
-        // Если ответ пустой или не JSON, возвращаем пустой объект
-        if (!contentType || !contentType.includes('application/json') || 
-            (contentLength && parseInt(contentLength) === 0)) {
-            return {} as T;
-        }
+            const contentType = response.headers.get('content-type');
+            const contentLength = response.headers.get('content-length');
 
-        const data = await response.json();
-        return data as T;
+            // Если ответ пустой или не JSON, возвращаем пустой объект
+            if (!contentType || !contentType.includes('application/json') ||
+                (contentLength && parseInt(contentLength) === 0)) {
+                return {} as T;
+            }
+
+            const data = await response.json();
+            return data as T;
         } catch (error) {
             console.error('Request failed:', error);
             throw error;
@@ -106,6 +106,41 @@ export default class MainService {
         return this.request('/short-link', {
             method: 'POST',
             body: link,
+        });
+    }
+
+    public async getAllAdmins(search?: string, page: number = 1, limit?: number) {
+        const params = new URLSearchParams();
+        if (search) {
+            params.append('q', search);
+        }
+        params.append('page', page.toString());
+        if (limit) {
+            params.append('limit', limit.toString());
+        }
+        const endpoint = `/users?${params.toString()}`;
+        return this.request(endpoint, {
+            method: 'GET',
+        });
+    }
+
+    public async updateAdmin(id: string, data: any) {
+        return this.request(`/users/${id}`, {
+            method: 'PUT',
+            body: data,
+        });
+    }
+
+    public async createAdmin(data: any) {
+        return this.request('/users', {
+            method: 'POST',
+            body: data,
+        });
+    }
+
+    public async deleteAdmin(id: string) {
+        return this.request(`/users/${id}`, {
+            method: 'DELETE',
         });
     }
 }

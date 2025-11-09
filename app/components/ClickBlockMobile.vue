@@ -1,23 +1,47 @@
 <template>
-  <div class="flex flex-col gap-2 bg-white rounded-2xl p-4 mb-4">
+  <div class="flex flex-col gap-2 bg-white rounded-2xl p-4 mb-4 relative">
+    <div
+      class="absolute -top-2 right-0 bg-red-500 rounded-full w-6 h-6 flex items-center justify-center"
+      @click="link.userId !== userId && userRole !== 2 ? null : $emit('deleteLink', link.id)"
+      :class="{ 'cursor-not-allowed! opacity-50!': link.userId !== userId && userRole !== 2 }"
+    >
+      <Icon name="mage:trash-fill" class="text-md text-white" @click="$emit('deleteLink', link.id)" />
+    </div>
     <div class="flex items-center gap-4">
-      <NuxtImg src="/images/icecream.png" alt="Clicker" width="{37}" height="{37}" class="w-[37px] h-[37px]" />
+      <div class="flex flex-col items-center gap-2">
+        <NuxtImg src="/images/icecream.png" alt="Clicker" width="{37}" height="{37}" class="w-[37px] h-[37px]" />
+        <div class="text-xs text-[#3A3D44] cursor-pointer hover:underline" @click="$emit('set-search')">
+          {{ link.userLogin || '—' }}
+        </div>
+      </div>
 
       <div class="flex flex-col justify-between gap-1 flex-1">
-        <div class="text-base text-[#3A3D44]">{{ link.name }}</div>
+        <div class="tooltip tooltip-secondary" :data-tip="link.name">
+          <div class="text-xs text-[#3176FF] line-clamp-1 break-all">
+            <div class="text-base text-[#3A3D44] line-clamp-1 break-all">{{ link.name }}</div>
+          </div>
+        </div>
         <div class="tooltip tooltip-secondary" :data-tip="link.full">
-          <div class="text-xs text-[#3176FF] line-clamp-1 break-all">{{ link.full }}</div>
+          <div class="text-xs text-[#3176FF] line-clamp-1 break-all">
+            <a :href="link.full" target="_blank">{{ link.full }}</a>
+          </div>
         </div>
         <div class="text-xs text-[#3A3D44] bg-[#F1F4F9] px-2 py-1 rounded-md w-fit">
           {{ dayjs.utc(link.created_at).local().format('DD.MM.YY HH:mm:ss') || '' }}
         </div>
       </div>
-      <div class="relative flex items-center justify-center h-full py-5 text-xl text-[#3A3D44] border-r-offset">
+      <div
+        class="relative flex items-center justify-center h-full py-5 text-xl text-[#3A3D44] border-r-offset"
+        :class="{ 'cursor-pointer underline': link.stats && link.stats.length > 0 }"
+        @click="$emit('showStats', link.id)"
+      >
         {{ link.clicks }} клк
       </div>
     </div>
     <div class="flex items-center justify-between mt-2">
-      <div>{{ shortLink.replace('https://', '') }}</div>
+      <div>
+        <a :href="shortLink" target="_blank">{{ shortLink.replace('https://', '') }}</a>
+      </div>
       <Icon name="fluent:document-copy-16-filled" class="text-3xl cursor-pointer" @click="copyLink" />
     </div>
   </div>
@@ -29,6 +53,9 @@
 
   const { copy } = useCopy();
   const { show: toast } = useToast();
+
+  const userId = useState('userId', () => null);
+  const userRole = useState('userRole', () => null);
 
   const shortLink = computed(() => 'https://4clk.me/' + props.link.short);
 
@@ -46,7 +73,7 @@
     },
   });
 
-  const emit = defineEmits(['deleteLink']);
+  const emit = defineEmits(['deleteLink', 'set-search', 'showStats']);
 
   const copyLink = async () => {
     const ok = await copy(shortLink.value);

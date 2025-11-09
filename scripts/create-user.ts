@@ -4,6 +4,7 @@ import { Schema, Document } from 'mongoose';
 interface IUser extends Document {
     login: string;
     password: string;
+    role: 1 | 2;
     createdAt: Date;
 }
 
@@ -18,6 +19,12 @@ const UserSchema = new Schema<IUser>({
         type: String,
         required: true,
     },
+    role: {
+        type: Number,
+        enum: [1, 2],
+        default: 2,
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -29,10 +36,17 @@ const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 async function createUser() {
     const login = process.argv[2];
     const password = process.argv[3];
+    const roleArg = process.argv[4];
 
     if (!login || !password) {
-        console.error('Usage: yarn create-user <login> <password>');
-        console.error('Example: yarn create-user admin mypassword123');
+        console.error('Usage: yarn create-user <login> <password> [role=1|2]');
+        console.error('Example: yarn create-user admin mypassword123 2');
+        process.exit(1);
+    }
+
+    const role = roleArg ? Number(roleArg) : 2;
+    if (role !== 1 && role !== 2) {
+        console.error('Role must be 1 or 2');
         process.exit(1);
     }
 
@@ -53,6 +67,7 @@ async function createUser() {
         const user = new User({
             login,
             password,
+            role,
             createdAt: new Date(),
         });
 

@@ -1,11 +1,16 @@
 <template>
   <!-- <div class="w-full bg-white rounded-4xl px-3 py-5 flex items-center justify-betwen gap-5 mb-2.5"> -->
-  <div class="flex items-center justify-center bg-white rounded-l-2xl p-5">
+  <div class="flex flex-col items-center justify-center bg-white rounded-l-2xl p-5 gap-2">
     <NuxtImg src="/images/icecream.png" alt="Clicker" width="{47}" height="{47}" class="w-[47px] h-[47px]" />
+    <div class="text-xs text-[#3A3D44] cursor-pointer hover:underline" @click="$emit('set-search')">
+      {{ link.userLogin || '—' }}
+    </div>
   </div>
   <div class="flex flex-col justify-between gap-1 pr-5 flex-1 bg-white py-4">
     <div class="text-base text-[#3A3D44]">{{ link.name }}</div>
-    <a :href="link.full" target="_blank" class="text-xs text-[#3176FF] line-clamp-1 break-all cursor-pointer">{{ link.full }}</a>
+    <a :href="link.full" target="_blank" class="text-xs text-[#3176FF] line-clamp-1 break-all cursor-pointer">{{
+      link.full
+    }}</a>
     <div class="text-xs text-[#3A3D44] bg-[#F1F4F9] px-2 py-1 rounded-md w-fit">
       {{ dayjs.utc(link.created_at).local().format('DD.MM.YY HH:mm:ss') || '' }}
     </div>
@@ -13,20 +18,27 @@
   <div
     class="px-6 bg-white relative flex items-center justify-between h-full py-5 text-base text-[#3176FF] border-x-offset"
   >
-    <a :href="shortLink" target="_blank" class="line-clamp-1 break-all cursor-pointer">{{ shortLink.replace('https://', '') }}</a>
-    <Icon name="fluent:document-copy-16-filled" class="text-2xl ml-8 flex-shrink-0 cursor-pointer" @click="copyLink" />
+    <a :href="shortLink" target="_blank" class="line-clamp-1 break-all cursor-pointer">{{
+      shortLink.replace('https://', '')
+    }}</a>
+    <Icon name="fluent:document-copy-16-filled" class="text-2xl ml-8 shrink-0 cursor-pointer" @click="copyLink" />
   </div>
   <div
     class="px-11 bg-white relative flex items-center justify-center h-full py-5 text-2xl text-[#3A3D44] border-r-offset"
+    :class="{ 'cursor-pointer underline': link.stats && link.stats.length > 0 }"
+    @click="$emit('showStats', link.id)"
   >
     {{ link.clicks }} {{ rightWords(link.clicks as number) }}
   </div>
   <div class="px-6 flex items-center justify-center bg-white rounded-r-2xl">
-    <div class="w-11 h-11 bg-[#F1F4F9] rounded-xl flex items-center justify-center cursor-pointer hover:opacity-50">
+    <div
+      class="w-11 h-11 bg-[#F1F4F9] rounded-xl flex items-center justify-center cursor-pointer hover:opacity-50"
+      :class="{ 'cursor-not-allowed! opacity-50!': link.userId !== userId && userRole !== 2 }"
+    >
       <Icon
         name="mage:trash-fill"
-        class="text-2xl text-[#3A3D4499] cursor-pointer"
-        @click="$emit('deleteLink', link.id)"
+        class="text-2xl text-[#3A3D4499]"
+        @click="link.userId !== userId && userRole !== 2 ? null : $emit('deleteLink', link.id)"
       />
     </div>
   </div>
@@ -54,7 +66,9 @@
     },
   });
 
-  const emit = defineEmits(['deleteLink']);
+  const userId = useState('userId', () => null);
+  const userRole = useState('userRole', () => null);
+  const emit = defineEmits(['deleteLink', 'showStats', 'set-search']);
 
   const shortLink = computed(() => 'https://4clk.me/' + props.link.short);
 
