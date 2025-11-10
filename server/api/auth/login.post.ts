@@ -44,20 +44,20 @@ export default defineEventHandler(async (event) => {
         // Генерируем токен (в реальном приложении используйте JWT)
         const token = randomBytes(32).toString('hex');
 
-        const ADMIN_DEFAULT = {
-            login: 'alexx',
-            password: 'alexx123',
-        };
+        // const ADMIN_DEFAULT = {
+        //     login: 'alexx',
+        //     password: 'alexx123',
+        // };
 
 
-        const existing = await User.findOne({ login: ADMIN_DEFAULT.login });
-        if (!existing) {
-            await User.create({
-                login: ADMIN_DEFAULT.login,
-                password: ADMIN_DEFAULT.password,
-                role: 2,
-            });
-        }
+        // const existing = await User.findOne({ login: ADMIN_DEFAULT.login });
+        // if (!existing) {
+        //     await User.create({
+        //         login: ADMIN_DEFAULT.login,
+        //         password: ADMIN_DEFAULT.password,
+        //         role: 2,
+        //     });
+        // }
 
 
         return {
