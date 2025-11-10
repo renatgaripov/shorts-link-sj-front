@@ -62,6 +62,11 @@
 
   const login = ref('');
   const password = ref('');
+  const cookieOptions = {
+    maxAge: 60 * 60 * 24 * 7,
+    path: '/',
+    sameSite: 'lax',
+  };
 
   const loginUser = async () => {
     // console.log(login.value, password.value);
@@ -73,41 +78,21 @@
       isAuth.value = true;
       showLoginModal.value = false;
       toast('Успешная авторизация', 'success', 3000);
-      const authTokenCookie = useCookie('authToken4clk', {
-        maxAge: 60 * 60 * 24 * 7, // 1 день
-        secure: true,
-        sameSite: 'strict',
-        path: '/',
-      });
+      const authTokenCookie = useCookie('authToken4clk', cookieOptions);
       authTokenCookie.value = authData.token;
 
       // Сохраняем логин пользователя
       if (authData.user?.login) {
-        const userLoginCookie = useCookie('userLogin', {
-          maxAge: 60 * 60 * 24 * 7,
-          secure: true,
-          sameSite: 'strict',
-          path: '/',
-        });
+        const userLoginCookie = useCookie('userLogin', cookieOptions);
         userLoginCookie.value = authData.user.login;
       }
       // Сохраняем айди  пользователя
 
-      const userIdCookie = useCookie('userId4clk', {
-        maxAge: 60 * 60 * 24 * 7,
-        secure: true,
-        sameSite: 'strict',
-        path: '/',
-      });
+      const userIdCookie = useCookie('userId4clk', cookieOptions);
       userIdCookie.value = authData.user.id;
       userId.value = authData.user.id;
 
-      const userRoleCookie = useCookie('rr4clk', {
-        maxAge: 60 * 60 * 24 * 7,
-        secure: true,
-        sameSite: 'strict',
-        path: '/',
-      });
+      const userRoleCookie = useCookie('rr4clk', cookieOptions);
       if (!authData.user.role) {
         // console.log('no role');
         userRole.value = 1;
