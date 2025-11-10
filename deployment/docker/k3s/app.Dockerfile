@@ -39,5 +39,5 @@ ENV PORT=3000
 ENV NUXT_HOST=0.0.0.0
 
 # Start the application
-CMD node .output/server/index.mjs > app.log
+CMD node .output/server/index.mjs
 
