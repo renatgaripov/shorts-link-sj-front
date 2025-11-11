@@ -9,15 +9,11 @@
       </div> -->
 
       <div class="flex flex-col justify-between gap-1 flex-1">
-        <div class="tooltip tooltip-secondary" :data-tip="link.name">
-          <div class="text-xs text-[#3176FF] line-clamp-1 break-all">
-            <div class="text-base text-[#3A3D44] line-clamp-1 break-all">{{ link.name }}</div>
-          </div>
+        <div class="text-xs text-[#3176FF] line-clamp-1 break-all">
+          <div class="text-base text-[#3A3D44] line-clamp-1 break-all">{{ link.name }}</div>
         </div>
-        <div class="tooltip tooltip-secondary" :data-tip="link.full">
-          <div class="text-xs text-[#3176FF] line-clamp-1 break-all">
-            <a :href="link.full" target="_blank">{{ link.full }}</a>
-          </div>
+        <div class="text-xs text-[#3176FF] line-clamp-1 break-all">
+          <a :href="link.full" target="_blank">{{ link.full }}</a>
         </div>
         <div class="flex items-center gap-2">
           <div class="text-xs text-[#3A3D44] bg-[#F1F4F9] px-2 py-1 rounded-md w-fit">
