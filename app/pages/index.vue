@@ -70,7 +70,7 @@
   <!-- SHOW STATS -->
   <dialog ref="modalRef4" id="my_modal_4" class="modal">
     <div class="modal-box w-[99%] md:w-[400px] md:max-w-[400px] bg-[#F1F4F9] rounded-2xl p-4 md:p-8">
-      <div class="text-lg">Статистика кликов по ссылке "{{ link?.name }}"?</div>
+      <div class="text-lg">Статистика кликов по ссылке "{{ link?.name }}"</div>
       <div class="mt-4">
         <template v-for="stat in link?.stats" :key="stat.date">
           <div class="flex items-center justify-start gap-2">
@@ -88,6 +88,9 @@
         </button>
       </div>
     </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
   </dialog>
   <!-- new link -->
   <dialog ref="modalRef2" id="my_modal_2" class="modal">
@@ -147,6 +150,9 @@
         </div>
       </div>
     </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
   </dialog>
   <!-- remove link -->
   <dialog ref="modalRef3" id="my_modal_3" class="modal">
@@ -167,6 +173,9 @@
         </button>
       </div>
     </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
   </dialog>
 </template>
 
@@ -315,6 +324,10 @@
 
   const saveLink = async () => {
     if (!validateForm()) return;
+    // Убираем последний слэш из URL если он есть
+    if (newLinkData.value.full.endsWith('/')) {
+      newLinkData.value.full = newLinkData.value.full.slice(0, -1);
+    }
     try {
       if (!newLinkData.value.name) {
         // @ts-ignore

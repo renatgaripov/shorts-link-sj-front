@@ -2,17 +2,23 @@
   <!-- <div class="w-full bg-white rounded-4xl px-3 py-5 flex items-center justify-betwen gap-5 mb-2.5"> -->
   <div class="flex flex-col items-center justify-center bg-white rounded-l-2xl p-5 gap-2">
     <NuxtImg src="/images/icecream.png" alt="Clicker" width="{47}" height="{47}" class="w-[47px] h-[47px]" />
-    <div class="text-xs text-[#3A3D44] cursor-pointer hover:underline" @click="$emit('set-search')">
-      {{ link.userLogin || '—' }}
-    </div>
   </div>
   <div class="flex flex-col justify-between gap-1 pr-5 flex-1 bg-white py-4">
     <div class="text-base text-[#3A3D44]">{{ link.name }}</div>
     <a :href="link.full" target="_blank" class="text-xs text-[#3176FF] line-clamp-1 break-all cursor-pointer">{{
       link.full
     }}</a>
-    <div class="text-xs text-[#3A3D44] bg-[#F1F4F9] px-2 py-1 rounded-md w-fit">
-      {{ dayjs.utc(link.created_at).local().format('DD.MM.YY HH:mm:ss') || '' }}
+    <div class="flex items-center gap-2">
+      <div class="text-xs text-[#3A3D44] bg-[#F1F4F9] px-2 py-1 rounded-md w-fit">
+        {{ dayjs.utc(link.created_at).local().format('DD.MM.YY HH:mm:ss') || '' }}
+      </div>
+      <div
+        v-if="link.userLogin"
+        class="text-xs text-[#3A3D44] bg-[#F1F4F9] px-2 py-1 rounded-md w-fit cursor-pointer hover:underline"
+        @click="$emit('set-search')"
+      >
+        {{ link.userLogin }}
+      </div>
     </div>
   </div>
   <div

@@ -139,6 +139,9 @@
         </button>
       </div>
     </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
   </dialog>
 
   <dialog ref="modalRef3" id="my_modal_3" class="modal">
@@ -160,6 +163,9 @@
         </button>
       </div>
     </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
   </dialog>
 </template>
 
