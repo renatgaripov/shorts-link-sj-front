@@ -4,7 +4,7 @@
     <NuxtImg src="/images/icecream.png" alt="Clicker" width="{47}" height="{47}" class="w-[47px] h-[47px]" />
   </div>
   <div class="flex flex-col justify-between gap-1 pr-5 flex-1 bg-white py-4">
-    <div class="text-base text-[#3A3D44]">{{ link.name }}</div>
+    <div class="text-base text-[#3A3D44] line-clamp-1 break-all">{{ link.name }}</div>
     <a :href="link.full" target="_blank" class="text-xs text-[#3176FF] line-clamp-1 break-all cursor-pointer">{{
       link.full
     }}</a>

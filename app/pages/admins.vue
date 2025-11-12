@@ -395,8 +395,17 @@
     }
   };
 
+  watch(userRole, (newRole) => {
+    if (newRole !== 2) {
+      navigateTo('/');
+    }
+  });
+
   onMounted(() => {
     getAllAdmins();
+    if (userRole.value !== 2) {
+      navigateTo('/');
+    }
   });
 </script>
 
