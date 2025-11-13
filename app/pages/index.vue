@@ -330,8 +330,16 @@
     }
     try {
       if (!newLinkData.value.name) {
-        // @ts-ignore
-        newLinkData.value.name = newLinkData.value.full.split('/').pop();
+        try {
+          const url = new URL(newLinkData.value.full);
+          const domain = url.hostname;
+          const path = url.pathname.slice(1); // убираем первый слэш
+          const pathPreview = path.length > 15 ? path.slice(0, 15) + '...' : path;
+          newLinkData.value.name = pathPreview ? `${domain}/${pathPreview}` : domain;
+        } catch {
+          // fallback на старую логику если URL невалидный
+          newLinkData.value.name = newLinkData.value.full.split('/').pop() || '';
+        }
       }
       const res = await mainService.createLink(newLinkData.value);
       closeModal2();
