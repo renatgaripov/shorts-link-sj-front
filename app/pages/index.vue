@@ -234,7 +234,7 @@
   const meta = ref({
     total: 0,
     page: 1,
-    limit: 3,
+    limit: 20,
     totalPages: 1,
     hasNextPage: false,
     hasPrevPage: false,
