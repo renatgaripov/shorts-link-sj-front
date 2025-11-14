@@ -63,6 +63,9 @@
         <div v-if="links.length === 0" class="text-center py-4">
           {{ search ? 'Ничего не найдено' : 'Ссылок пока нет' }}
         </div>
+        <div v-if="links.length > 0" ref="loadMoreTrigger" class="h-10 flex items-center justify-center py-4">
+          <div v-if="loadingMore" class="text-sm text-[#3A3D44]">Загрузка...</div>
+        </div>
       </template>
     </div>
   </div>
@@ -214,6 +217,8 @@
 
   const search = ref('');
   const loading = ref(false);
+  const loadingMore = ref(false);
+  const loadMoreTrigger = ref<HTMLElement | null>(null);
 
   const buttonDisabled = computed(() => {
     return !newLinkData.value.full;
@@ -229,7 +234,7 @@
   const meta = ref({
     total: 0,
     page: 1,
-    limit: 20,
+    limit: 3,
     totalPages: 1,
     hasNextPage: false,
     hasPrevPage: false,
@@ -240,8 +245,24 @@
 
   // Отслеживаем изменения поискового запроса
   watch(debouncedSearch, async (newSearch) => {
-    await getAllLinks(newSearch, meta.value.page);
+    meta.value.page = 1;
+    links.value = [];
+    await getAllLinks(newSearch, 1, true);
   });
+
+  // Intersection Observer для бесконечной прокрутки
+  useIntersectionObserver(
+    loadMoreTrigger,
+    (entries) => {
+      const entry = entries[0];
+      if (entry?.isIntersecting && meta.value.hasNextPage && !loadingMore.value && !loading.value) {
+        loadMore();
+      }
+    },
+    {
+      threshold: 0.1,
+    }
+  );
 
   const deleteLink = (id: number) => {
     deleteName.value = links.value.find((item) => item.id === id)?.name || null;
@@ -344,7 +365,9 @@
       const res = await mainService.createLink(newLinkData.value);
       closeModal2();
       toast('Ссылка сохранена', 'success', 3000);
-      await getAllLinks(search.value); // Перезагружаем с текущим поиском
+      meta.value.page = 1;
+      links.value = [];
+      await getAllLinks(search.value, 1, true); // Перезагружаем с текущим поиском
       newLinkData.value = {
         full: '',
         short: '',
@@ -356,28 +379,49 @@
     }
   };
 
-  const getAllLinks = async (searchQuery: string = '', page: number = 1) => {
-    loading.value = true;
+  const getAllLinks = async (searchQuery: string = '', page: number = 1, reset: boolean = false) => {
+    if (reset) {
+      loading.value = true;
+    } else {
+      loadingMore.value = true;
+    }
     try {
-      // Не передаем limit, будет использовано значение по умолчанию (20)
-      const res = await mainService.getAllLinks(searchQuery, page);
+      const res = await mainService.getAllLinks(searchQuery, page, meta.value.limit);
       if (res && typeof res === 'object' && 'data' in res && 'meta' in res) {
-        links.value = (res as any).data as Link[];
+        const newLinks = (res as any).data as Link[];
+        if (reset) {
+          links.value = newLinks;
+        } else {
+          links.value = [...links.value, ...newLinks];
+        }
         meta.value = (res as any).meta;
       } else {
         // Fallback для старого формата (если API еще не обновлен)
-        links.value = res as Link[];
+        if (reset) {
+          links.value = res as Link[];
+        } else {
+          links.value = [...links.value, ...(res as Link[])];
+        }
       }
     } catch (error) {
       toast('Ошибка получения ссылок', 'error', 3000);
-      links.value = [];
+      if (reset) {
+        links.value = [];
+      }
     } finally {
       loading.value = false;
+      loadingMore.value = false;
     }
   };
 
+  const loadMore = async () => {
+    if (!meta.value.hasNextPage || loadingMore.value || loading.value) return;
+    const nextPage = meta.value.page + 1;
+    await getAllLinks(search.value, nextPage, false);
+  };
+
   onMounted(() => {
-    getAllLinks();
+    getAllLinks('', 1, true);
   });
 
   const ADMIN_DEFAULT = {
