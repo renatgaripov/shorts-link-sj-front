@@ -125,7 +125,7 @@
         </div>
         <div>
           <fieldset class="fieldset">
-            <legend class="fieldset-legend font-normal">Название для ссылки</legend>
+            <legend class="fieldset-legend font-normal">Название для ссылки (опционально)</legend>
             <input
               type="text"
               v-model="newLinkData.name"
