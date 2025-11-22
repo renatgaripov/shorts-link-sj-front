@@ -24,7 +24,20 @@
             />
           </fieldset>
         </div>
+
+        <div class="">
+          <select
+            class="select rounded-full border-none ring-none outline-none focus:outline-none pl-6 pr-10 text-xs text-[#231F20]/50 max-md:w-full"
+            v-model="searchUser"
+          >
+            <option selected value="">Все сотрудники</option>
+            <template v-for="user in users" :key="user.id">
+              <option :value="user.login">{{ user.login }}</option>
+            </template>
+          </select>
+        </div>
       </div>
+
       <div>
         <button
           class="rounded-2xl bg-[#3176FF] text-white px-4 py-3 text-base w-[215px] hover:opacity-80 cursor-pointer max-md:mt-4"
@@ -185,6 +198,7 @@
 <script setup lang="ts">
   import MainService from '@/services/mainService';
   import type { Link } from '@/types/links';
+  import { get } from 'mongoose';
   const { show: toast } = useToast();
   const dayjs = useDayjs();
 
@@ -420,8 +434,26 @@
     await getAllLinks(search.value, nextPage, false);
   };
 
+  const searchUser = ref('');
+  const users = ref<any[]>([]);
+  const getUsers = async () => {
+    try {
+      const res: any = await mainService.getAllAdmins();
+      users.value = res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  watch(searchUser, async (newSearch) => {
+    meta.value.page = 1;
+    links.value = [];
+    await getAllLinks(newSearch, 1, true);
+  });
+
   onMounted(() => {
     getAllLinks('', 1, true);
+    getUsers();
   });
 
   const ADMIN_DEFAULT = {
